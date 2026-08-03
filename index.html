@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Smash Boyz — Chattanooga</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;1,600&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --yellow:#f6b421;
+    --yellow-deep:#e19a0f;
+    --orange:#e85d29;
+    --orange-deep:#c74f10;
+    --red:#c62828;
+    --red-deep:#8f1c1c;
+    --black:#181008;
+    --cream:#fff7e6;
+    --line: rgba(24,16,8,0.16);
+    --ease: cubic-bezier(.22,.61,.36,1);
+    --ease-soft: cubic-bezier(.16,.84,.44,1);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{ scroll-behavior:smooth; }
+  body{
+    background:var(--yellow);
+    color:var(--black);
+    font-family:'Poppins', sans-serif;
+    font-weight:500;
+    -webkit-text-size-adjust:100%;
+  }
+  h1,h2,h3,.display{
+    font-family:'Bungee', sans-serif;
+    font-weight:400;
+    text-transform:uppercase;
+  }
+  .marker{ font-family:'Permanent Marker', cursive; }
+  a{color:inherit; text-decoration:none;}
+  img{display:block; width:100%; height:100%; object-fit:cover;}
+  button{font-family:inherit;}
+
+  /* ---------- outlined red text (graffiti/bold border style) ---------- */
+  .outline-red{
+    color:var(--red);
+    -webkit-text-stroke:2.5px var(--black);
+    paint-order:stroke fill;
+    text-shadow:3px 3px 0 var(--black);
+  }
+
+  /* ---------- TOP BAR ---------- */
+  .top-bar{
+    position:fixed; top:0; left:0; right:0; z-index:200;
+    display:grid;
+    grid-template-columns:1fr auto 1fr;
+    align-items:center;
+    gap:20px;
+    padding:16px 34px;
+    background:rgba(246,180,33,0.88);
+    backdrop-filter:blur(8px);
+    border-bottom:2px solid rgba(24,16,8,0.1);
+    transition:background .3s ease, box-shadow .3s ease;
+  }
+  .top-bar.scrolled{
+    box-shadow:0 6px 20px -8px rgba(0,0,0,0.25);
+  }
+  .logo-link{
+    justify-self:center;
+    width:54px; height:54px;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    transition:transform .35s var(--ease-soft);
+  }
+  .logo-link:hover{ transform:translateY(-3px) scale(1.06); }
+  .logo-link img{ object-fit:contain; filter:drop-shadow(0 3px 6px rgba(0,0,0,0.35)); transition:filter .3s ease; }
+  .logo-link:hover img{ filter:drop-shadow(0 6px 14px rgba(198,40,40,0.45)); }
+
+  .top-nav{
+    display:flex; gap:28px; align-items:center;
+  }
+  .top-nav.nav-left{ justify-self:start; }
+  .top-nav.nav-right{ justify-self:end; }
+  .top-nav a{
+    font-family:'Bungee', sans-serif;
+    font-size:11.5px; letter-spacing:0.02em; text-transform:uppercase;
+    color:var(--black);
+    position:relative;
+    padding:4px 0;
+    transition:color .3s ease;
+    white-space:nowrap;
+  }
+  .top-nav a::after{
+    content:'';
+    position:absolute; left:0; right:100%; bottom:-3px; height:2.5px;
+    background:var(--red);
+    transition:right .3s var(--ease-soft);
+  }
+  .top-nav a:hover{ color:var(--orange-deep); }
+  .top-nav a:hover::after,
+  .top-nav a.active::after{ right:0; }
+  .top-nav a.active{ color:var(--red); }
+
+  /* ---------- VERTICAL SECTION INDICATOR ---------- */
+  .side-dots{
+    position:fixed; right:22px; top:50%; transform:translateY(-50%); z-index:200;
+    display:flex; flex-direction:column; gap:14px;
+    align-items:center;
+  }
+  .side-dots button{
+    width:10px; height:10px; border-radius:50%;
+    background:rgba(24,16,8,0.22);
+    border:1.5px solid var(--black);
+    padding:0; cursor:pointer;
+    transition:background .3s ease, height .3s var(--ease-soft), transform .2s ease;
+  }
+  .side-dots button:hover{ transform:scale(1.2); }
+  .side-dots button.active{ background:var(--red); height:28px; border-radius:6px; }
+
+  /* ---------- floating mascot / inline bob ---------- */
+  .mascot-bob-inline{ animation:bob-inline 3.4s ease-in-out infinite; }
+  @keyframes bob-inline{ 0%,100%{ transform:translateY(0) rotate(-4deg); } 50%{ transform:translateY(-6px) rotate(4deg); } }
+  .mascot{
+    position:absolute;
+    z-index:5;
+    filter:drop-shadow(0 10px 18px rgba(0,0,0,0.3));
+    pointer-events:none;
+  }
+  .mascot.bob{ animation:bob 4s ease-in-out infinite; }
+  @keyframes bob{ 0%,100%{ transform:translateY(0) rotate(var(--rot,0deg)); } 50%{ transform:translateY(-14px) rotate(var(--rot,0deg)); } }
+
+  /* ---------- reveal-on-scroll ---------- */
+  .reveal{
+    opacity:0; transform:translateY(36px);
+    transition:opacity .8s var(--ease-soft), transform .8s var(--ease-soft);
+  }
+  .reveal.in{ opacity:1; transform:translateY(0); }
+
+  /* ---------- SECTION BASE ---------- */
+  .section{
+    width:100%;
+    min-height:100vh;
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    scroll-margin-top:0;
+  }
+
+  /* ---------- SECTION: INTRO ---------- */
+  .section-intro{
+    background:
+      radial-gradient(ellipse 900px 700px at 50% 40%, rgba(232,100,28,0.25), transparent 65%),
+      var(--yellow);
+    flex-direction:column;
+    gap:16px;
+    text-align:center;
+    padding:120px 24px 80px;
+  }
+  .intro-icon{
+    width:min(220px, 32vw);
+    max-height:26vh;
+    object-fit:contain;
+    margin:0 auto 6px;
+    filter:drop-shadow(0 16px 30px rgba(0,0,0,0.28));
+  }
+  .intro-sub{
+    font-family:'Permanent Marker', cursive;
+    font-size:clamp(15px, 2.4vw, 20px);
+    color:var(--red-deep);
+    max-width:480px;
+  }
+  .scroll-cue{
+    position:absolute; bottom:32px; left:50%; transform:translateX(-50%);
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    color:var(--black); opacity:0.55;
+    animation:cue-bounce 2.2s ease-in-out infinite;
+  }
+  .scroll-cue span{
+    font-family:'Bungee',sans-serif; font-size:9.5px; letter-spacing:0.16em; text-transform:uppercase;
+  }
+  .scroll-cue svg{ width:20px; height:20px; }
+  @keyframes cue-bounce{ 0%,100%{ transform:translate(-50%,0); } 50%{ transform:translate(-50%,8px); } }
+
+  /* ---------- SECTION: OUR STORY ---------- */
+  .section-story{ background:var(--red); color:var(--cream); }
+  .story-layout{
+    display:grid; grid-template-columns:1fr 1fr;
+    width:100%; min-height:100vh;
+    align-items:center;
+  }
+  .story-image-slot{
+    height:100%; min-height:100vh;
+    position:relative;
+    overflow:hidden;
+    background:rgba(0,0,0,0.12);
+  }
+  .story-image-slot img{ transition:transform .6s var(--ease-soft); }
+  .story-image-slot:hover img{ transform:scale(1.05); }
+  .story-text{
+    padding:80px 64px;
+    position:relative;
+  }
+  .story-heading-row{
+    display:flex; align-items:center; gap:14px;
+    margin-bottom:22px;
+  }
+  .story-heading-row .eyebrow{ margin-bottom:0; color:var(--yellow); }
+  .story-mascot-icon{
+    width:54px; height:54px;
+    object-fit:contain;
+    filter:drop-shadow(0 6px 10px rgba(0,0,0,0.3));
+  }
+  .eyebrow{
+    font-family:'Bungee',sans-serif;
+    font-size:11px; letter-spacing:0.16em; color:var(--yellow);
+    background:var(--black);
+    display:inline-block;
+    padding:8px 16px;
+    border-radius:6px;
+    border:2px solid var(--black);
+  }
+  .story-text h2{
+    font-size:clamp(32px, 4.4vw, 54px);
+    line-height:0.98;
+    color:var(--yellow);
+    -webkit-text-stroke:2.5px var(--black);
+    paint-order:stroke fill;
+    text-shadow:3px 3px 0 var(--black);
+    margin-bottom:24px;
+  }
+  .story-text p{
+    font-size:15.5px; line-height:1.8;
+    color:#fff2dc;
+    max-width:420px;
+    margin-bottom:14px;
+    font-weight:400;
+  }
+
+  /* ---------- SECTION: MENU ---------- */
+  .section-menu{ background:var(--cream); color:var(--black); padding:110px 60px 100px; }
+  .menu-title{
+    display:flex; align-items:center; justify-content:center; gap:14px;
+    margin-bottom:6px;
+  }
+  .menu-mascot-icon{
+    width:54px; height:54px;
+    object-fit:contain;
+    filter:drop-shadow(0 6px 10px rgba(0,0,0,0.3));
+  }
+  .menu-title h2{
+    font-size:clamp(34px, 5vw, 56px);
+  }
+  .menu-columns{
+    display:grid;
+    grid-template-columns:1.3fr 0.9fr 0.9fr;
+    gap:50px;
+    margin-top:44px;
+    max-width:1200px;
+    margin-left:auto; margin-right:auto;
+  }
+  .menu-cat-title{
+    font-family:'Bungee',sans-serif;
+    font-size:16px;
+    color:var(--red);
+    -webkit-text-stroke:1px var(--black);
+    paint-order:stroke fill;
+    margin-bottom:16px;
+    padding-bottom:8px;
+    border-bottom:3px dashed var(--black);
+  }
+  .menu-item{
+    margin-bottom:18px;
+    padding:6px 8px;
+    margin-left:-8px; margin-right:-8px;
+    border-radius:10px;
+    transition:background .25s ease, transform .25s ease;
+  }
+  .menu-item:hover{ background:rgba(198,40,40,0.07); transform:translateX(3px); }
+  .menu-item-row{
+    display:flex; justify-content:space-between; align-items:baseline; gap:10px;
+    font-family:'Bungee',sans-serif;
+    font-size:14px;
+    color:var(--black);
+  }
+  .menu-item-row .price{
+    color:var(--red);
+    font-size:14px;
+    white-space:nowrap;
+  }
+  .menu-item p{
+    font-size:12px; line-height:1.55;
+    color:#4a4030;
+    margin-top:4px;
+    font-weight:400;
+    max-width:320px;
+  }
+
+  /* ---------- SECTION: LOCATION + CONTACT (merged) ---------- */
+  .section-location{ background:var(--red); color:var(--cream); }
+  .location-layout{
+    display:grid; grid-template-columns:1.1fr 0.9fr;
+    width:100%; min-height:100vh;
+  }
+  .location-map{
+    height:100%; min-height:100vh;
+    position:relative;
+    overflow:hidden;
+    background:rgba(0,0,0,0.18);
+  }
+  .location-map img{ transition:transform .6s var(--ease-soft); }
+  .location-map:hover img{ transform:scale(1.05); }
+  .location-info{
+    padding:90px 56px 70px;
+    display:flex; flex-direction:column; justify-content:center;
+    position:relative;
+  }
+  .location-info .eyebrow{
+    width:fit-content;
+    margin-bottom:22px;
+  }
+  .location-heading-row{
+    display:flex; align-items:center; gap:14px;
+    margin-bottom:26px;
+  }
+  .location-heading-row h2{ margin-bottom:0; }
+  .location-info h2{
+    font-size:clamp(30px, 4vw, 46px);
+    color:var(--yellow);
+    -webkit-text-stroke:2.5px var(--black);
+    paint-order:stroke fill;
+    text-shadow:3px 3px 0 var(--black);
+    line-height:1;
+  }
+  .location-mascot-icon{
+    width:60px; height:60px;
+    object-fit:contain;
+    filter:drop-shadow(0 6px 10px rgba(0,0,0,0.35));
+  }
+  .loc-block{
+    margin-bottom:22px;
+    padding-bottom:22px;
+    border-bottom:2px dashed rgba(255,247,230,0.35);
+  }
+  .loc-block:last-of-type{ border-bottom:none; }
+  .loc-block .label{
+    font-family:'Bungee',sans-serif;
+    font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--yellow);
+    margin-bottom:8px;
+  }
+  .loc-block p{ font-size:14.5px; line-height:1.7; color:#fff2dc; font-weight:400; }
+
+  .location-contact-links{
+    display:flex; gap:12px; flex-wrap:wrap;
+    margin-top:4px;
+  }
+  .location-contact-links a{
+    font-family:'Bungee',sans-serif;
+    font-size:11px; letter-spacing:0.05em; text-transform:uppercase;
+    padding:12px 22px;
+    border:2.5px solid var(--yellow);
+    border-radius:40px;
+    color:var(--yellow);
+    transition:all .3s var(--ease-soft);
+  }
+  .location-contact-links a:hover{ background:var(--yellow); color:var(--black); transform:translateY(-2px); }
+
+  /* ---------- SECTION: GALLERY ---------- */
+  .section-gallery{
+    background:var(--yellow);
+    color:var(--black);
+    flex-direction:column;
+    padding:110px 40px 100px;
+    gap:44px;
+  }
+  .gallery-heading{
+    text-align:center;
+  }
+  .gallery-heading .eyebrow{
+    margin-bottom:14px;
+  }
+  .gallery-heading h2{
+    font-size:clamp(34px, 5.5vw, 60px);
+    color:var(--red);
+    -webkit-text-stroke:2.5px var(--black);
+    paint-order:stroke fill;
+    text-shadow:3px 3px 0 var(--black);
+  }
+  .gallery-grid{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    grid-auto-rows:170px;
+    gap:14px;
+    width:100%;
+    max-width:1180px;
+  }
+  .gallery-item{
+    position:relative;
+    overflow:hidden;
+    border-radius:14px;
+    border:2.5px solid var(--black);
+    cursor:pointer;
+  }
+  .gallery-item:nth-child(1){ grid-column:span 2; grid-row:span 2; }
+  .gallery-item:nth-child(4){ grid-row:span 2; }
+  .gallery-item:nth-child(7){ grid-column:span 2; }
+  .gallery-item img{
+    transition:transform .55s var(--ease-soft), filter .4s ease;
+    filter:saturate(0.95) brightness(0.96);
+  }
+  .gallery-item::after{
+    content:'';
+    position:absolute; inset:0;
+    background:linear-gradient(to top, rgba(0,0,0,0.6), transparent 55%);
+    opacity:0; transition:opacity .35s ease;
+  }
+  .gallery-item:hover img{ transform:scale(1.09); filter:saturate(1.1) brightness(1); }
+  .gallery-item:hover::after{ opacity:1; }
+  .gallery-item .tag{
+    position:absolute; left:14px; bottom:12px; z-index:2;
+    font-family:'Bungee',sans-serif; font-size:11px; letter-spacing:0.04em; text-transform:uppercase;
+    color:var(--cream);
+    opacity:0; transform:translateY(8px);
+    transition:opacity .3s ease, transform .3s ease;
+  }
+  .gallery-item:hover .tag{ opacity:1; transform:translateY(0); }
+
+  /* ---------- FOOTER ---------- */
+  .site-footer{
+    background:var(--black);
+    color:var(--cream);
+    padding:44px 40px 26px;
+  }
+  .footer-top{
+    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap;
+    gap:24px;
+    max-width:1200px; margin:0 auto;
+    padding-bottom:28px;
+    border-bottom:1px solid rgba(255,247,230,0.15);
+  }
+  .footer-logo{
+    display:flex; align-items:center; gap:10px;
+    cursor:pointer;
+  }
+  .footer-logo img{
+    width:34px; height:34px; object-fit:contain;
+    transition:transform .3s var(--ease-soft);
+  }
+  .footer-logo:hover img{ transform:rotate(-8deg) scale(1.08); }
+  .footer-logo span{
+    font-family:'Bungee',sans-serif; font-size:14px; letter-spacing:0.02em; text-transform:uppercase;
+    color:var(--cream);
+  }
+  .footer-nav{
+    display:flex; gap:24px; flex-wrap:wrap;
+  }
+  .footer-nav a{
+    font-family:'Bungee',sans-serif; font-size:11px; letter-spacing:0.04em; text-transform:uppercase;
+    color:rgba(255,247,230,0.75);
+    transition:color .25s ease;
+  }
+  .footer-nav a:hover{ color:var(--yellow); }
+  .footer-social{
+    display:flex; gap:18px;
+  }
+  .footer-social a{
+    font-family:'Bungee',sans-serif; font-size:11px; letter-spacing:0.04em; text-transform:uppercase;
+    color:var(--yellow);
+    transition:color .25s ease, transform .25s ease;
+    display:inline-block;
+  }
+  .footer-social a:hover{ color:var(--red); transform:translateY(-2px); }
+  .footer-bottom{
+    max-width:1200px; margin:0 auto;
+    padding-top:18px;
+    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap;
+    gap:8px;
+    font-size:11.5px;
+    color:rgba(255,247,230,0.45);
+  }
+
+  /* =======================================================
+     MOBILE
+     ======================================================= */
+  @media (max-width: 900px){
+    .top-bar{ padding:12px 12px; gap:6px; }
+    .logo-link{ width:40px; height:40px; }
+    .top-nav{ gap:8px; }
+    .top-nav a{ font-size:8px; }
+
+    .side-dots{ right:10px; gap:10px; }
+    .side-dots button{ width:7px; height:7px; }
+    .side-dots button.active{ height:20px; }
+
+    .section-intro{ padding:100px 20px 70px; }
+    .intro-icon{ width:44vw; max-height:20vh; }
+    .intro-sub{ font-size:14px; padding:0 10px; }
+
+    .story-layout{ grid-template-columns:1fr; }
+    .story-image-slot{ min-height:46vh; }
+    .story-text{ padding:44px 26px; }
+    .story-mascot-icon{ width:38px; height:38px; }
+    .story-text p{ max-width:none; font-size:13.5px; }
+
+    .section-menu{ padding:90px 20px 60px; }
+    .menu-columns{ grid-template-columns:1fr; gap:30px; }
+    .menu-mascot-icon{ width:38px; height:38px; }
+
+    .location-layout{ grid-template-columns:1fr; }
+    .location-map{ min-height:40vh; }
+    .location-info{ padding:44px 24px; }
+    .location-mascot-icon{ width:40px; height:40px; }
+    .location-heading-row{ margin-bottom:16px; }
+
+    .section-gallery{ padding:80px 18px 60px; }
+    .gallery-grid{ grid-template-columns:repeat(2, 1fr); grid-auto-rows:140px; }
+    .gallery-item:nth-child(1){ grid-column:span 2; grid-row:span 1; }
+    .gallery-item:nth-child(4){ grid-row:span 1; }
+    .gallery-item:nth-child(7){ grid-column:span 1; }
+
+    .site-footer{ padding:36px 22px 22px; }
+    .footer-top{ flex-direction:column; align-items:flex-start; gap:18px; }
+    .footer-bottom{ flex-direction:column; align-items:flex-start; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="top-bar" id="topBar">
+    <nav class="top-nav nav-left">
+      <a href="#story" data-section="story">Our Story</a>
+      <a href="#menu" data-section="menu">Menu</a>
+    </nav>
+    <a href="#intro" class="logo-link" id="logoLink" aria-label="Smash Boyz — back to top">
+      <img src="images/topbar-icon.png" alt="Smash Boyz icon">
+    </a>
+    <nav class="top-nav nav-right">
+      <a href="#location" data-section="location">Location</a>
+      <a href="#gallery" data-section="gallery">Gallery</a>
+    </nav>
+  </div>
+
+  <div class="side-dots" id="sideDots">
+    <button class="active" data-section="intro" aria-label="Intro"></button>
+    <button data-section="story" aria-label="Our Story"></button>
+    <button data-section="menu" aria-label="Menu"></button>
+    <button data-section="location" aria-label="Location &amp; Contact"></button>
+    <button data-section="gallery" aria-label="Gallery"></button>
+  </div>
+
+  <!-- ============ SECTION: INTRO ============ -->
+  <section class="section section-intro" id="intro">
+    <img class="intro-icon" src="images/intro-icon.png" alt="Smash Boyz">
+    <p class="intro-sub">Burgers. Loud music. Late nights. Chattanooga's smash burger trailer.</p>
+    <div class="scroll-cue">
+      <span>Scroll</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
+    </div>
+  </section>
+
+  <!-- ============ SECTION: OUR STORY ============ -->
+  <section class="section section-story" id="story">
+    <div class="story-layout">
+      <div class="story-image-slot">
+        <img src="images/story-photo.jpg" alt="Smash Boyz trailer">
+      </div>
+      <div class="story-text reveal">
+        <div class="story-heading-row">
+          <p class="eyebrow">Our Story</p>
+          <img class="story-mascot-icon mascot-bob-inline" src="images/mascot-burger-cleaver.png" alt="">
+        </div>
+        <h2>Started Under<br>a Pop-Up Tent</h2>
+        <p>What began as a pop-up has grown into a crowd-ready trailer built on quality beef, house-made sauces, and a love for underground culture — live music, skateboarding, car meets.</p>
+        <p>[Client to confirm/expand: origin story, who started it, why smash burgers, what "Smash Boyz" means to them.]</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION: MENU ============ -->
+  <section class="section section-menu" id="menu">
+    <div style="width:100%; max-width:1200px; margin:0 auto;">
+      <div class="menu-title reveal">
+        <img class="menu-mascot-icon mascot-bob-inline" src="images/mascot-hotdog-skate.png" alt="">
+        <h2 class="outline-red">The Menu</h2>
+      </div>
+      <div class="menu-columns reveal">
+        <div>
+          <div class="menu-cat-title">Burgers &amp; Mains</div>
+          <div class="menu-item">
+            <div class="menu-item-row"><span>Two Step</span><span class="price">$12</span></div>
+            <p>Two smashed patties on a potato bun, American cheese, onions, pickles &amp; secret sauce.</p>
+          </div>
+          <div class="menu-item">
+            <div class="menu-item-row"><span>Thrasher</span><span class="price">$13</span></div>
+            <p>Two smashed patties, jalapeno jack cheese, crispy onions, jalapenos &amp; thrasher sauce.</p>
+          </div>
+          <div class="menu-item">
+            <div class="menu-item-row"><span>Glizzy</span><span class="price">$7</span></div>
+            <p>Angus beef frank on a bun with onions, relish &amp; secret sauce.</p>
+          </div>
+          <div class="menu-item">
+            <div class="menu-item-row"><span>Grilled Chz</span><span class="price">$5</span></div>
+            <p>Cheddar &amp; American cheese on Texas toast with secret sauce.</p>
+          </div>
+        </div>
+        <div>
+          <div class="menu-cat-title">Sides</div>
+          <div class="menu-item"><div class="menu-item-row"><span>Fries</span><span class="price">$5</span></div></div>
+          <div class="menu-item"><div class="menu-item-row"><span>Chips</span><span class="price">$3</span></div></div>
+          <div class="menu-item"><div class="menu-item-row"><span>Drinks</span><span class="price">$2</span></div></div>
+        </div>
+        <div>
+          <div class="menu-cat-title">Kid's Menu</div>
+          <div class="menu-item">
+            <div class="menu-item-row"><span>Plain Dawg</span><span class="price">$5</span></div>
+            <p>Angus beef frank on a bun.</p>
+          </div>
+          <div class="menu-item">
+            <div class="menu-item-row"><span>Single Smash</span><span class="price">$8</span></div>
+            <p>Single smashed beef patty on a potato bun with American cheese.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION: LOCATION + CONTACT (merged) ============ -->
+  <section class="section section-location" id="location">
+    <div class="location-layout">
+      <div class="location-map">
+        <img src="images/map.jpg" alt="Map">
+      </div>
+      <div class="location-info reveal">
+        <p class="eyebrow">Find Us</p>
+        <div class="location-heading-row">
+          <h2>Catch The<br>Trailer</h2>
+          <img class="location-mascot-icon mascot-bob-inline" src="images/mascot-hotdog-skate.png" alt="">
+        </div>
+        <div class="loc-block">
+          <div class="label">This Week</div>
+          <p>[Client to confirm: current weekly schedule / locations — trailer moves around Chattanooga.]</p>
+        </div>
+        <div class="loc-block">
+          <div class="label">Book Us</div>
+          <p>Available for private events, parties &amp; catering. [Client to confirm booking process.]</p>
+        </div>
+        <div class="loc-block">
+          <div class="label">Get At Us</div>
+          <div class="location-contact-links">
+            <a href="mailto:Smashboyzllc@gmail.com">Email Us</a>
+            <a href="https://instagram.com/smashboyzchatt" target="_blank" rel="noopener">@smashboyzchatt</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION: GALLERY ============ -->
+  <section class="section section-gallery" id="gallery">
+    <div class="gallery-heading reveal">
+      <p class="eyebrow">Come Get Smashed</p>
+      <h2>The Gallery</h2>
+    </div>
+    <div class="gallery-grid reveal">
+      <div class="gallery-item"><img src="images/gallery-1.jpg" alt=""><span class="tag">Two Step Burger</span></div>
+      <div class="gallery-item"><img src="images/gallery-2.jpg" alt=""><span class="tag">Thrasher Burger</span></div>
+      <div class="gallery-item"><img src="images/gallery-3.jpg" alt=""><span class="tag">Crispy Fries</span></div>
+      <div class="gallery-item"><img src="images/gallery-4.jpg" alt=""><span class="tag">Glizzy Dog</span></div>
+      <div class="gallery-item"><img src="images/gallery-5.jpg" alt=""><span class="tag">Grilled Cheese</span></div>
+      <div class="gallery-item"><img src="images/gallery-6.jpg" alt=""><span class="tag">Smash Patty Stack</span></div>
+      <div class="gallery-item"><img src="images/gallery-7.jpg" alt=""><span class="tag">Fresh Off The Flat Top</span></div>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="site-footer">
+    <div class="footer-top">
+      <a href="#intro" class="footer-logo" id="footerLogo">
+        <img src="images/topbar-icon.png" alt="Smash Boyz icon">
+        <span>Smash Boyz</span>
+      </a>
+      <nav class="footer-nav">
+        <a href="#story" data-section="story">Our Story</a>
+        <a href="#menu" data-section="menu">Menu</a>
+        <a href="#location" data-section="location">Location</a>
+        <a href="#gallery" data-section="gallery">Gallery</a>
+      </nav>
+      <div class="footer-social">
+        <a href="https://instagram.com/smashboyzchatt" target="_blank" rel="noopener">Instagram</a>
+        <a href="mailto:Smashboyzllc@gmail.com">Email</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 Smash Boyz. Chattanooga, TN.</span>
+      <span>Made with love, beef &amp; secret sauce.</span>
+    </div>
+  </footer>
+
+  <script>
+    const sections = Array.from(document.querySelectorAll('.section'));
+    const sideDots = document.querySelectorAll('.side-dots button');
+    const navLinks = document.querySelectorAll('.top-nav a, .footer-nav a');
+    const topBar = document.getElementById('topBar');
+
+    function setActive(id){
+      sideDots.forEach(b => b.classList.toggle('active', b.dataset.section === id));
+      navLinks.forEach(a => a.classList.toggle('active', a.dataset.section === id));
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if(entry.isIntersecting){
+          setActive(entry.target.id);
+        }
+      });
+    }, { threshold: 0.5 });
+    sections.forEach(s => observer.observe(s));
+
+    // reveal-on-scroll animation
+    const revealEls = document.querySelectorAll('.reveal');
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if(entry.isIntersecting){
+          entry.target.classList.add('in');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.2 });
+    revealEls.forEach(el => revealObserver.observe(el));
+
+    // top bar shadow on scroll
+    window.addEventListener('scroll', () => {
+      topBar.classList.toggle('scrolled', window.scrollY > 20);
+    }, { passive:true });
+
+    // side dots + nav click -> smooth scroll
+    function goToSection(id){
+      const el = document.getElementById(id);
+      if(el) el.scrollIntoView({ behavior:'smooth' });
+    }
+    sideDots.forEach(b => b.addEventListener('click', () => goToSection(b.dataset.section)));
+    navLinks.forEach(a => a.addEventListener('click', (e) => {
+      e.preventDefault();
+      goToSection(a.dataset.section);
+    }));
+    document.getElementById('logoLink').addEventListener('click', (e) => {
+      e.preventDefault();
+      goToSection('intro');
+    });
+    const footerLogo = document.getElementById('footerLogo');
+    if(footerLogo){
+      footerLogo.addEventListener('click', (e) => {
+        e.preventDefault();
+        goToSection('intro');
+      });
+    }
+  </script>
+</body>
+</html>
