@@ -72,7 +72,9 @@
     transition:transform .35s var(--ease-soft);
   }
   .logo-link:hover{ transform:translateY(-3px) scale(1.06); }
-  .logo-link img{ object-fit:contain; transition:filter .3s ease; }
+  .logo-link img{ object-fit:contain; filter:drop-shadow(0 3px 6px rgba(0,0,0,0.35)); transition:filter .3s ease; }
+  .logo-link:hover img{ filter:drop-shadow(0 6px 14px rgba(198,40,40,0.45)); }
+
   .top-nav{
     display:flex; gap:28px; align-items:center;
   }
@@ -147,49 +149,31 @@
 
   /* ---------- SECTION: INTRO ---------- */
   .section-intro{
-    background:var(--yellow);
+    background:
+      radial-gradient(ellipse 900px 700px at 50% 40%, rgba(232,100,28,0.25), transparent 65%),
+      var(--yellow);
     flex-direction:column;
     gap:16px;
     text-align:center;
     padding:120px 24px 80px;
-  }
-  .intro-video{
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    z-index:0;
-  }
-  .intro-video-overlay{
-    position:absolute;
-    inset:0;
-    z-index:1;
-    background:
-      radial-gradient(ellipse 900px 700px at 50% 40%, rgba(232,100,28,0.25), transparent 65%),
-      rgba(24,16,8,0.35);
-  }
-  .section-intro > *:not(.intro-video):not(.intro-video-overlay){
-    position:relative;
-    z-index:2;
   }
   .intro-icon{
     width:min(220px, 32vw);
     max-height:26vh;
     object-fit:contain;
     margin:0 auto 6px;
+    filter:drop-shadow(0 16px 30px rgba(0,0,0,0.28));
   }
   .intro-sub{
     font-family:'Permanent Marker', cursive;
     font-size:clamp(15px, 2.4vw, 20px);
-    color:var(--cream);
+    color:var(--red-deep);
     max-width:480px;
-    text-shadow:0 2px 10px rgba(0,0,0,0.5);
   }
   .scroll-cue{
     position:absolute; bottom:32px; left:50%; transform:translateX(-50%);
     display:flex; flex-direction:column; align-items:center; gap:6px;
-    color:var(--cream); opacity:0.75;
+    color:var(--black); opacity:0.55;
     animation:cue-bounce 2.2s ease-in-out infinite;
   }
   .scroll-cue span{
@@ -425,7 +409,22 @@
     transition:transform .55s var(--ease-soft), filter .4s ease;
     filter:saturate(0.95) brightness(0.96);
   }
+  .gallery-item::after{
+    content:'';
+    position:absolute; inset:0;
+    background:linear-gradient(to top, rgba(0,0,0,0.6), transparent 55%);
+    opacity:0; transition:opacity .35s ease;
+  }
   .gallery-item:hover img{ transform:scale(1.09); filter:saturate(1.1) brightness(1); }
+  .gallery-item:hover::after{ opacity:1; }
+  .gallery-item .tag{
+    position:absolute; left:14px; bottom:12px; z-index:2;
+    font-family:'Bungee',sans-serif; font-size:11px; letter-spacing:0.04em; text-transform:uppercase;
+    color:var(--cream);
+    opacity:0; transform:translateY(8px);
+    transition:opacity .3s ease, transform .3s ease;
+  }
+  .gallery-item:hover .tag{ opacity:1; transform:translateY(0); }
 
   /* ---------- FOOTER ---------- */
   .site-footer{
@@ -552,10 +551,6 @@
 
   <!-- ============ SECTION: INTRO ============ -->
   <section class="section section-intro" id="intro">
-    <video class="intro-video" autoplay muted loop playsinline poster="images/intro-video-poster.jpg">
-      <source src="images/intro-video.mp4" type="video/mp4">
-    </video>
-    <div class="intro-video-overlay"></div>
     <img class="intro-icon" src="images/intro-icon.png" alt="Smash Boyz">
     <p class="intro-sub">Burgers. Loud music. Late nights. Chattanooga's smash burger trailer.</p>
     <div class="scroll-cue">
@@ -668,13 +663,13 @@
       <h2>The Gallery</h2>
     </div>
     <div class="gallery-grid reveal">
-      <div class="gallery-item"><img src="images/gallery-1.jpg" alt="Two Step Burger"></div>
-      <div class="gallery-item"><img src="images/gallery-2.jpg" alt="Thrasher Burger"></div>
-      <div class="gallery-item"><img src="images/gallery-3.jpg" alt="Crispy Fries"></div>
-      <div class="gallery-item"><img src="images/gallery-4.jpg" alt="Glizzy Dog"></div>
-      <div class="gallery-item"><img src="images/gallery-5.jpg" alt="Grilled Cheese"></div>
-      <div class="gallery-item"><img src="images/gallery-6.jpg" alt="Smash Patty Stack"></div>
-      <div class="gallery-item"><img src="images/gallery-7.jpg" alt="Fresh Off The Flat Top"></div>
+      <div class="gallery-item"><img src="images/gallery-1.jpg" alt=""><span class="tag">Two Step Burger</span></div>
+      <div class="gallery-item"><img src="images/gallery-2.jpg" alt=""><span class="tag">Thrasher Burger</span></div>
+      <div class="gallery-item"><img src="images/gallery-3.jpg" alt=""><span class="tag">Crispy Fries</span></div>
+      <div class="gallery-item"><img src="images/gallery-4.jpg" alt=""><span class="tag">Glizzy Dog</span></div>
+      <div class="gallery-item"><img src="images/gallery-5.jpg" alt=""><span class="tag">Grilled Cheese</span></div>
+      <div class="gallery-item"><img src="images/gallery-6.jpg" alt=""><span class="tag">Smash Patty Stack</span></div>
+      <div class="gallery-item"><img src="images/gallery-7.jpg" alt=""><span class="tag">Fresh Off The Flat Top</span></div>
     </div>
   </section>
 
